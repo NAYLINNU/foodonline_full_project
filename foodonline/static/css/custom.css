@@ -1,0 +1,19 @@
+.show-notification {
+    animation-duration: 3s;
+    animation-name: slidein;
+    animation-iteration-count: unset;
+    animation-direction: normal;
+}
+
+
+@keyframes slidein {
+    from {
+        margin-left: 100%;
+        width: 100%;
+    }
+
+    to {
+        margin-left: 0%;
+        width: 100%;
+    }
+}
