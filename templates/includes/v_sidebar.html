@@ -5,10 +5,10 @@
                 class="{% if '/accounts/vendorDashboard/' == request.path or '/accounts/vendor/' == request.path %}active{% endif %}">
                 <a href="{% url 'vendorDashboard' %}"><i class="icon-dashboard3"></i>Dashboard</a>
             </li>
-            <li class="{% if 'profile' in request.path %}active{% endif %}"><a href="{% url 'v_profile' %}"><i
+            <li class="{% if 'profile' in request.path %}active{% endif %}"><a href=""><i
                         class="icon-building"></i>My Restaurant</a>
             </li>
-            <li class="{% if 'menu-builder' in request.path %}active{% endif %}"><a href="{%  url 'menu_builder' %}"><i
+            <li class="{% if 'menu-builder' in request.path %}active{% endif %}"><a href=""><i
                         class="icon-menu5"></i>Menu Builder</a>
             </li>
             <li><a href="restaurant-orders.html"><i class="icon-add_shopping_cart"></i>Orders</a>
