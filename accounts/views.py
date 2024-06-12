@@ -14,35 +14,35 @@ from django.contrib.auth.models import AnonymousUser
 #####*** REMEMBER HERE ***#####
 #I CAN'T GO TO "vendor/profile and anythings url when is logout"
 #  #Restrict the vendor from accessing the customer page for 403 forbiden error using with user_passes_test
-# def check_role_vendor(user):
-#     if user.role == 1:
-        
-#         return True
-#     else:
-#         raise PermissionDenied
-
-# #Restrict the customer from accessing the vendor page for 403 forbiden error using with user_passes_test
-# def check_role_customer(user):
-#     if user.role == 2:
-#         return True
-#     else:
-#         raise PermissionDenied
-
 def check_role_vendor(user):
-    if isinstance(user, AnonymousUser):
-        return False  # Return False for unauthenticated users
-    elif user.role == User.VENDOR:  # Assuming User.VENDOR represents the vendor role
+    if user.role == 1:
+        
         return True
     else:
         raise PermissionDenied
 
+#Restrict the customer from accessing the vendor page for 403 forbiden error using with user_passes_test
 def check_role_customer(user):
-    if isinstance(user, AnonymousUser):
-        return False  # Return False for unauthenticated users
-    elif user.role == User.CUSTOMER:  # Assuming User.CUSTOMER represents the customer role
+    if user.role == 2:
         return True
     else:
         raise PermissionDenied
+
+# def check_role_vendor(user):
+#     if isinstance(user, AnonymousUser):
+#         return False  # Return False for unauthenticated users
+#     elif user.role == User.VENDOR:  # Assuming User.VENDOR represents the vendor role
+#         return True
+#     else:
+#         raise PermissionDenied
+
+# def check_role_customer(user):
+#     if isinstance(user, AnonymousUser):
+#         return False  # Return False for unauthenticated users
+#     elif user.role == User.CUSTOMER:  # Assuming User.CUSTOMER represents the customer role
+#         return True
+#     else:
+#         raise PermissionDenied
 
 def registerUser(request):
     if request.user.is_authenticated:
