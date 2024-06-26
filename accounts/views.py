@@ -1,19 +1,18 @@
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
-from django.contrib import messages,auth
-from django.contrib.auth.decorators import login_required,user_passes_test
+from django.shortcuts import redirect, render
+from django.contrib.auth.tokens import default_token_generator
 from accounts.utils import detectUser, send_verification_email
 from vendor.forms import VendorForm
+from vendor.models import Vendor
 from .forms import UserForm
 from .models import User, UserProfile
+from django.contrib import messages,auth
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.utils.http import urlsafe_base64_decode
-from django.contrib.auth.tokens import default_token_generator
+from django.template.defaultfilters import slugify
 from django.contrib.auth.models import AnonymousUser
-
-#####*** REMEMBER HERE ***#####
-#I CAN'T GO TO "vendor/profile and anythings url when is logout"
-#  #Restrict the vendor from accessing the customer page for 403 forbiden error using with user_passes_test
+# Restrict the vendor from accessing the customer page for 403 forbiden error using with user_passes_test
 def check_role_vendor(user):
     if user.role == 1:
         
@@ -27,6 +26,7 @@ def check_role_customer(user):
         return True
     else:
         raise PermissionDenied
+
 
 # def check_role_vendor(user):
 #     if isinstance(user, AnonymousUser):
@@ -44,14 +44,13 @@ def check_role_customer(user):
 #     else:
 #         raise PermissionDenied
 
+
 def registerUser(request):
     if request.user.is_authenticated:
         messages.warning(request,'You are already login')
-        return redirect('myAccount')
+        return redirect('registerUser')
     elif request.method == 'POST':
-        
         form = UserForm(request.POST)
-        
         if form.is_valid():
             # created the user using form for hashing password
             # password = form.cleaned_data['password']
@@ -71,7 +70,7 @@ def registerUser(request):
             user.role = User.CUSTOMER
             user.save() 
             
-            # #Send verification Email
+            #Send verification Email
             mail_subject = 'Please activate your account'
             email_template = 'accounts/emails/acc_verify_email.html'
             send_verification_email(request, user, mail_subject,email_template )
@@ -112,13 +111,13 @@ def registerVendor(request):
             user.save()
             vendor = v_form.save(commit=False)
             vendor.user = user
-            # vendor_name = v_form.cleaned_data['vendor_name']
-            # vendor.vendor_slug = slugify(vendor_name)+'-'+str(user.id)
+            vendor_name = v_form.cleaned_data['vendor_name']
+            vendor.vendor_slug = slugify(vendor_name)+'-'+str(user.id)
             user_profile = UserProfile.objects.get(user=user)
             vendor.user_profile= user_profile
             vendor.save()
     
-             #Send verification Email
+            # #Send verification Email
             mail_subject = 'Please activate your account'
             email_template = 'accounts/emails/acc_verify_email.html'
             send_verification_email(request, user, mail_subject,email_template )
@@ -175,6 +174,8 @@ def login(request):
     return render(request,'accounts/login.html')
 
 
+
+
 def logout(request):
     auth.logout(request)
     messages.info(request,'Logout Successfully')
@@ -198,8 +199,6 @@ def custDashboard(request):
 def vendorDashboard(request):
     return render(request,'accounts/vendorDashboard.html')
 
-
-
 def forgot_password(request):
     if request.method == 'POST':
         email = request.POST['email']
@@ -214,7 +213,7 @@ def forgot_password(request):
             messages.success(request, 'Password reset link have been sent to your email address.')
             return redirect('login')
         else:
-            messages.error(request,'Email does not exit')
+            messages.error(request,'Account does not exit')
             return redirect('forgot_password')
         
     return render(request,'accounts/forgot_password.html')
