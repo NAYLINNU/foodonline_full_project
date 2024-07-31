@@ -124,10 +124,38 @@ def delete_category(request, pk=None):
     messages.success(request,'Category deleted successfully')
     return redirect('menu_builder')
 
+# @user_passes_test(check_role_vendor)
+# @login_required(login_url='login')
+# def add_food(request):
+#     # i need to fix already food error
+#     if request.method == 'POST':      
+#         form = FoodItemForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             foodtitle = form.cleaned_data['food_title']
+#             food = form.save(commit=False)
+#             food.vendor = get_vendor(request)
+#             food.slug = slugify(foodtitle)
+#             form.save()
+#             messages.success(request,'Food Item added successfully')
+#             return redirect('fooditem_category', food.category.id)
+#         else:
+#             print(form.errors)
+#     else:
+#         form = FoodItemForm()
+#         #modify this form
+#         form.fields['category'].queryset = Category.objects.filter(vendor=get_vendor(request))
+                  
+#     context = {
+#         'form':form,
+#     }
+#     return render(request,'vendor/add_food.html',context)
+
+
+######  here is i change with AI  ####
+
 @user_passes_test(check_role_vendor)
 @login_required(login_url='login')
 def add_food(request):
-    # i need to fix already food error
     if request.method == 'POST':      
         form = FoodItemForm(request.POST, request.FILES)
         if form.is_valid():
@@ -135,21 +163,30 @@ def add_food(request):
             food = form.save(commit=False)
             food.vendor = get_vendor(request)
             food.slug = slugify(foodtitle)
-            form.save()
-            messages.success(request,'Food Item added successfully')
-            return redirect('fooditem_category', food.category.id)
+            
+            # Ensure the slug is unique
+            original_slug = food.slug
+            counter = 1
+            while FoodItem.objects.filter(slug=food.slug).exists():
+                food.slug = f"{original_slug}-{counter}"
+                counter += 1
+            
+            try:
+                form.save()
+                messages.success(request, 'Food Item added successfully')
+                return redirect('fooditem_category', food.category.id)
+            except IntegrityError:
+                messages.error(request, 'There was an error saving the food item. Please try again.')
         else:
             print(form.errors)
     else:
         form = FoodItemForm()
-        #modify this form
         form.fields['category'].queryset = Category.objects.filter(vendor=get_vendor(request))
                   
     context = {
-        'form':form,
+        'form': form,
     }
-    return render(request,'vendor/add_food.html',context)
-
+    return render(request, 'vendor/add_food.html', context)
 
 @user_passes_test(check_role_vendor)
 @login_required(login_url='login')
