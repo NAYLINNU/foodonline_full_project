@@ -154,18 +154,15 @@
                                             <div class="payment-method">
                                                 <label>
                                                     <input type="radio" name="payment_method" value="PayPal">
-                                                    <img src="{% static 'images/PayPal.png' %}" alt="PayPal" width="100">
+                                                    <img src="{% static 'images/PayPal.png' %} " style="position: absolute; left:200px "  alt="PayPal" width="100">
                                                 </label>
-                                                &emsp;
-                                                <label>
-                                                    <input type="radio" name="payment_method" value="RazorPay">
-                                                    <img src="{% static 'images/razorpay_logo.png' %}" alt="RazorPay" width="100">
-                                                </label>
+                                                
+                                               
                                             </div>
                                             <span class="text-danger" id="payment-method-error"></span>
                                             <!-- Select payment method -->
 
-                                            <button onclick="return payMethodConfirm();" type="submit" class="btn btn-danger w-100 p-2 mt-3">PLACE ORDER</button>
+                                            <button onclick="return payMethodConfirm();" type="submit" class="btn btn-danger w-100 p-2 mt-4">PLACE ORDER</button>
                                         </ul>
 
 

@@ -1,4 +1,4 @@
-from urllib import response
+
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from marketplace.models import Cart, Tax
@@ -10,13 +10,11 @@ import simplejson as json
 from .utils import generate_order_number, order_total_by_vendor
 from accounts.utils import send_notification
 from django.contrib.auth.decorators import login_required
-# import razorpay
-# from foodOnline_main.settings import RZP_KEY_ID, RZP_KEY_SECRET
+
 from django.contrib.sites.shortcuts import get_current_site
 
 
 
-# client = razorpay.Client(auth=(RZP_KEY_ID, RZP_KEY_SECRET))
 
 
 
@@ -32,7 +30,7 @@ def place_order(request):
         if i.fooditem.vendor.id not in vendors_ids:
             vendors_ids.append(i.fooditem.vendor.id)
     
-    # {"vendor_id":{"subtotal":{"tax_type": {"tax_percentage": "tax_amount"}}}}
+    {"vendor_id":{"subtotal":{"tax_type": {"tax_percentage": "tax_amount"}}}}
     get_tax = Tax.objects.filter(is_active=True)
     subtotal = 0
     total_data = {}
@@ -87,28 +85,16 @@ def place_order(request):
             order.payment_method = request.POST['payment_method']
             order.save() # order id/ pk is generated
             order.order_number = generate_order_number(order.id)
-            order.vendors.add(*vendors_ids)
+            # order.vendors.add(*vendors_ids)
             order.save()
 
-            # RazorPay Payment
-            DATA = {
-                "amount": float(order.total) * 100,
-                "currency": "INR",
-                "receipt": "receipt #"+order.order_number,
-                "notes": {
-                    "key1": "value3",
-                    "key2": "value2"
-                }
-            }
-            # rzp_order = client.order.create(data=DATA)
-            # rzp_order_id = rzp_order['id']
+            
 
             context = {
                 'order': order,
                 'cart_items': cart_items,
-                # 'rzp_order_id': rzp_order_id,
-                # 'RZP_KEY_ID': RZP_KEY_ID,
-                'rzp_amount': float(order.total) * 100,
+              
+                
             }
             return render(request, 'orders/place_order.html', context)
 
