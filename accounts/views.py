@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.contrib.auth.tokens import default_token_generator
@@ -13,6 +14,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils.http import urlsafe_base64_decode
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import AnonymousUser
+import datetime
 # Restrict the vendor from accessing the customer page for 403 forbiden error using with user_passes_test
 def check_role_vendor(user):
     if user.role == 1:
@@ -205,7 +207,30 @@ def custDashboard(request):
 @user_passes_test(check_role_vendor)
 @login_required(login_url='login')
 def vendorDashboard(request):
-    return render(request,'accounts/vendorDashboard.html')
+    vendor = Vendor.objects.get(user=request.user)
+    orders = Order.objects.filter(vendors__in=[vendor.id], is_ordered=True).order_by('created_at')
+    recent_orders = orders[:10]
+
+    # current month's revenue
+    current_month = datetime.datetime.now().month
+    current_month_orders = orders.filter(vendors__in=[vendor.id], created_at__month=current_month)
+    current_month_revenue = 0
+    for i in current_month_orders:
+        current_month_revenue += i.get_total_by_vendor()['grand_total']
+    
+
+    # total revenue
+    total_revenue = 0
+    for i in orders:
+        total_revenue += i.get_total_by_vendor()['grand_total']
+    context = {
+        'orders': orders,
+        'orders_count': orders.count(),
+        'recent_orders': recent_orders,
+        'total_revenue': total_revenue,
+        'current_month_revenue': current_month_revenue,
+    }
+    return render(request, 'accounts/vendorDashboard.html', context)
 
 def forgot_password(request):
     if request.method == 'POST':

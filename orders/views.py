@@ -85,7 +85,7 @@ def place_order(request):
             order.payment_method = request.POST['payment_method']
             order.save() # order id/ pk is generated
             order.order_number = generate_order_number(order.id)
-            # order.vendors.add(*vendors_ids)
+            order.vendors.add(*vendors_ids)
             order.save()
 
             
